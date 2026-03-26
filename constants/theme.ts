@@ -5,24 +5,36 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorLight = '#2563eb';
+const tintColorDark = '#3b82f6';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#111111',
+    textMuted: '#6b7280',
+    background: '#ffffff',
+    surface: '#f5f5f5',
+    border: '#e5e7eb',
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    primary: tintColorLight,
+    success: '#16a34a',
+    danger: '#dc2626',
+    icon: '#6b7280',
+    tabIconDefault: '#6b7280',
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: '#f5f5f5',
+    textMuted: '#9ca3af',
+    background: '#0f0f0f',
+    surface: '#1a1a1a',
+    border: '#2a2a2a',
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    primary: tintColorDark,
+    success: '#22c55e',
+    danger: '#ef4444',
+    icon: '#9ca3af',
+    tabIconDefault: '#9ca3af',
     tabIconSelected: tintColorDark,
   },
 };
@@ -47,7 +59,8 @@ export const Fonts = Platform.select({
   web: {
     sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
+    rounded:
+      "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });

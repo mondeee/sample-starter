@@ -1,98 +1,140 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { DogBreedDetailModal } from '@/components/DogBreedDetailModal';
+import { DogBreedListSkeleton } from '@/components/DogBreedListSkeleton';
+import { DogBreedRow } from '@/components/DogBreedRow';
+import { useDogBreedsGalleryInfinite } from '@/hooks/useDogBreedsGallery';
+import type { DogBreedGalleryItem } from '@/lib/api/dogBreedsGalleryApi';
+import { FlashList, type ListRenderItem } from '@shopify/flash-list';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Platform, ScrollView, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const insets = useSafeAreaInsets();
+  const [selected, setSelected] = useState<DogBreedGalleryItem | null>(null);
+  const {
+    flatItems,
+    total,
+    isPending,
+    isError,
+    error,
+    onRefresh,
+    onEndReached,
+    isRefetching,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useDogBreedsGalleryInfinite();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const renderItem = useCallback<ListRenderItem<DogBreedGalleryItem>>(
+    ({ item }) => (
+      <DogBreedRow
+        label={item.label}
+        imageUrl={item.imageUrl}
+        onPress={() => setSelected(item)}
+      />
+    ),
+    [],
+  );
+
+  const keyExtractor = useCallback((item: DogBreedGalleryItem) => item.id, []);
+
+  const ListFooterComponent = useCallback(
+    () =>
+      isFetchingNextPage ? (
+        <View className="items-center py-4">
+          <ActivityIndicator />
+        </View>
+      ) : null,
+    [isFetchingNextPage],
+  );
+
+  const summary =
+    total != null
+      ? `${flatItems.length} loaded · ${total} total${hasNextPage ? '' : ' · end'}`
+      : `${flatItems.length} loaded`;
+
+  const listHeader = (
+    <View className="border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+      <Text className="text-2xl font-bold text-text-DEFAULT dark:text-text-dark">
+        Dog breeds
+      </Text>
+      <Text className="text-text-DEFAULT/70 dark:text-text-dark/70 mt-1 text-sm">
+        FlashList · 20 per page · {summary}
+      </Text>
+    </View>
+  );
+
+  const skeletonHeader = (
+    <View className="border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+      <Text className="text-2xl font-bold text-text-DEFAULT dark:text-text-dark">
+        Dog breeds
+      </Text>
+      <Text className="text-text-DEFAULT/70 dark:text-text-dark/70 mt-1 text-sm">
+        FlashList · 20 per page · Loading first page…
+      </Text>
+    </View>
+  );
+
+  if (isPending && flatItems.length === 0) {
+    return (
+      <View
+        className="flex-1 bg-background dark:bg-background-dark"
+        style={{ paddingTop: insets.top }}
+      >
+        {skeletonHeader}
+        <ScrollView
+          className="flex-1"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <DogBreedListSkeleton count={12} />
+        </ScrollView>
+      </View>
+    );
+  }
+
+  if (isError && flatItems.length === 0) {
+    return (
+      <View
+        className="flex-1 items-center justify-center bg-background px-6 dark:bg-background-dark"
+        style={{ paddingTop: insets.top }}
+      >
+        <Text className="mb-4 text-center text-base text-red-500">
+          {error instanceof Error ? error.message : 'Could not load breeds'}
+        </Text>
+        <Text
+          className="text-text-DEFAULT dark:text-text-dark text-sm underline"
+          onPress={() => onRefresh()}
+        >
+          Try again
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View
+      className="flex-1 bg-background dark:bg-background-dark"
+      style={{ paddingTop: insets.top }}
+    >
+      {listHeader}
+      <FlashList
+        style={{ flex: 1 }}
+        data={flatItems}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        drawDistance={400}
+        removeClippedSubviews={Platform.OS !== 'web'}
+        onRefresh={onRefresh}
+        refreshing={isRefetching && !isFetchingNextPage}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.35}
+        ListFooterComponent={ListFooterComponent}
+      />
+      <DogBreedDetailModal
+        item={selected}
+        visible={selected != null}
+        onClose={() => setSelected(null)}
+      />
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
