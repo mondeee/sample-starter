@@ -1,6 +1,6 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore } from '@/src/store/auth';
 
 export const apiClient = axios.create({
   timeout: 30_000,

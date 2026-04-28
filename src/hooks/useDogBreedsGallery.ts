@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 import {
   dogBreedsSeedsQueryKey,
   fetchDogBreedsGalleryPage,
-} from '@/lib/api/dogBreedsGalleryApi';
+} from '@/src/lib/api/dogBreedsGalleryApi';
 
 export const dogBreedsGalleryInfiniteQueryKey = [
   'dogBreeds',
@@ -21,19 +21,14 @@ export function useDogBreedsGalleryInfinite() {
     queryKey: [...dogBreedsGalleryInfiniteQueryKey, PAGE_SIZE] as const,
     initialPageParam: 0,
     queryFn: ({ pageParam, signal }) =>
-      fetchDogBreedsGalleryPage(
-        queryClient,
-        pageParam,
-        PAGE_SIZE,
-        signal,
-      ),
-    getNextPageParam: (lastPage) =>
+      fetchDogBreedsGalleryPage(queryClient, pageParam, PAGE_SIZE, signal),
+    getNextPageParam: lastPage =>
       lastPage.nextOffset < lastPage.total ? lastPage.nextOffset : undefined,
     staleTime: 1000 * 60 * 10,
   });
 
   const flatItems = useMemo(
-    () => query.data?.pages.flatMap((p) => p.items) ?? [],
+    () => query.data?.pages.flatMap(p => p.items) ?? [],
     [query.data?.pages],
   );
 

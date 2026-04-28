@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { Colors } from '@/constants/theme';
+import { Colors } from '@/src/constants/theme';
 import { useColorScheme } from 'nativewind';
 
 export default function TabLayout() {

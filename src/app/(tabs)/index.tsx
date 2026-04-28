@@ -1,5 +1,5 @@
 import { useDogBreedsGalleryInfinite } from '@/hooks/useDogBreedsGallery';
-import type { DogBreedGalleryItem } from '@/lib/api/dogBreedsGalleryApi';
+import { DogBreedGalleryItem } from '@/lib/api';
 import { FlashList, type ListRenderItem } from '@shopify/flash-list';
 import { useCallback, useState } from 'react';
 import {
@@ -10,9 +10,9 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DogBreedDetailModal } from '../components/DogBreedDetailModal';
-import { DogBreedListSkeleton } from '../components/DogBreedListSkeleton';
-import { DogBreedRow } from '../components/DogBreedRow';
+import { DogBreedDetailModal } from '../../components/DogBreedDetailModal';
+import { DogBreedListSkeleton } from '../../components/DogBreedListSkeleton';
+import { DogBreedRow } from '../../components/DogBreedRow';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();

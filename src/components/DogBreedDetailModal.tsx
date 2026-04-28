@@ -1,4 +1,4 @@
-import type { DogBreedGalleryItem } from '@/lib/api/dogBreedsGalleryApi';
+import type { DogBreedGalleryItem } from '@/src/lib/api/dogBreedsGalleryApi';
 import { Image } from 'expo-image';
 import { Modal, Pressable, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
